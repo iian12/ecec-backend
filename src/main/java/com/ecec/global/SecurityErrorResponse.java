@@ -1,4 +1,4 @@
 package com.ecec.global;
 
-public class SecurityErrorResponse {
+public record SecurityErrorResponse(String code, String message) {
 }
