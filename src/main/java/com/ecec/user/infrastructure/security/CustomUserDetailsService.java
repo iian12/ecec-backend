@@ -1,6 +1,7 @@
 package com.ecec.user.infrastructure.security;
 
-import com.ecec.auth.domain.AuthAccount;
+import com.ecec.auth.domain.account.AuthAccount;
+import com.ecec.auth.domain.account.AuthAccountRepository;
 import com.ecec.auth.infrastructure.security.LoginUserDetails;
 import com.ecec.user.domain.User;
 import com.ecec.user.domain.repository.UserRepository;

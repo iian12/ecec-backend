@@ -22,20 +22,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
-        Objects.requireNonNull(user, "User must not be null");
-
-        UserEntity savedEntity = jpaRepository.save(UserMapper.toEntity(user));
-
-        return UserMapper.toDomain(savedEntity);
-    }
-
-    @Override
-    @Transactional
-    public void update(User user) {
         UserEntity entity = jpaRepository.findById(user.getId().value())
-                .orElseThrow(UserNotFoundException::new);
+                .map(existing -> {
+                    UserMapper.updateEntity(user, existing);
+                    return existing;
+                })
+                .orElseGet(() -> UserMapper.toEntity(user));
 
-        UserMapper.updateEntity(user, entity);
+        return UserMapper.toDomain(
+                jpaRepository.save(entity)
+        );
     }
 
     @Override

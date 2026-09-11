@@ -1,6 +1,6 @@
-package com.ecec.auth.infrastructure.persistence;
+package com.ecec.auth.infrastructure.persistence.account;
 
-import com.ecec.auth.domain.AuthProvider;
+import com.ecec.auth.domain.account.AuthProvider;
 import com.ecec.global.id.AssignedIdEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -36,13 +36,13 @@ public class AuthAccountEntity extends AssignedIdEntity {
     private Instant createdAt;
 
     @Column
-    private Instant updateAt;
+    private Instant updatedAt;
 
     @Column
     private Instant lastLoginAt;
 
     @Builder
-    public AuthAccountEntity(Long id, Long userId, String email, String encodedPassword, AuthProvider provider, String providerUserId, Instant createdAt, Instant updateAt, Instant lastLoginAt) {
+    public AuthAccountEntity(Long id, Long userId, String email, String encodedPassword, AuthProvider provider, String providerUserId, Instant createdAt, Instant updatedAt, Instant lastLoginAt) {
         this.id = id;
         this.userId = userId;
         this.email = email;
@@ -50,7 +50,7 @@ public class AuthAccountEntity extends AssignedIdEntity {
         this.provider = provider;
         this.providerUserId = providerUserId;
         this.createdAt = createdAt;
-        this.updateAt = updateAt;
+        this.updatedAt = updatedAt;
         this.lastLoginAt = lastLoginAt;
     }
 
@@ -67,6 +67,6 @@ public class AuthAccountEntity extends AssignedIdEntity {
     }
 
     void setUpdateAt(Instant updateAt) {
-        this.updateAt = updateAt;
+        this.updatedAt = updateAt;
     }
 }

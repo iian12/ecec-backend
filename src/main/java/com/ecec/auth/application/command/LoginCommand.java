@@ -1,4 +1,4 @@
-package com.ecec.auth.application;
+package com.ecec.auth.application.command;
 
 public record LoginCommand(String email, String password) {
     public LoginCommand {

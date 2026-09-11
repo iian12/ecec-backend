@@ -1,4 +1,4 @@
-package com.ecec.auth.domain;
+package com.ecec.auth.application.security;
 
 import com.ecec.user.domain.Role;
 import com.ecec.user.domain.UserId;

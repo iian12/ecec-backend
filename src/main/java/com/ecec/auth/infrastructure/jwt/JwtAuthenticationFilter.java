@@ -1,7 +1,6 @@
-package com.ecec.auth.infrastructure.persistence;
+package com.ecec.auth.infrastructure.jwt;
 
-import com.ecec.auth.domain.AccessTokenClaims;
-import com.ecec.auth.infrastructure.jwt.JwtAccessTokenProvider;
+import com.ecec.auth.application.security.AccessTokenClaims;
 import com.ecec.auth.infrastructure.security.AppPrincipal;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -9,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -54,7 +54,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractAccessToken(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
+        if (request.getCookies() == null) {
+            String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+            return accessToken != null && accessToken.startsWith("Bearer ") ? accessToken.substring(7) : null;
+        }
 
         return Arrays.stream(request.getCookies())
                 .filter(cookie -> "access_token".equals(cookie.getName()))

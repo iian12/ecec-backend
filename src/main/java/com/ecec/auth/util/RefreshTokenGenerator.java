@@ -1,5 +1,6 @@
-package com.ecec.auth.application;
+package com.ecec.auth.util;
 
+import com.ecec.auth.application.result.IssuedRefreshToken;
 import com.ecec.auth.infrastructure.jwt.JwtProperties;
 import org.springframework.stereotype.Component;
 

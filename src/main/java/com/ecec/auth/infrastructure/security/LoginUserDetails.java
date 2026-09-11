@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public record LoginUserDetails(UserId userId,
                                String email,
@@ -19,21 +20,10 @@ public record LoginUserDetails(UserId userId,
                                AccountStatus accountStatus) implements UserDetails {
 
     public LoginUserDetails {
-        if (userId == null) {
-            throw new IllegalArgumentException("User ID must not be null");
-        }
-
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email must not be blank");
-        }
-
-        if (encodedPassword == null || encodedPassword.isBlank()) {
-            throw new IllegalArgumentException("Encoded password must not be blank");
-        }
-
-        if (role == null) {
-            throw new IllegalArgumentException("Role must not be null");
-        }
+        Objects.requireNonNull(userId, "userId must not be null");
+        Objects.requireNonNull(email, "email must not be null");
+        Objects.requireNonNull(encodedPassword, "encodedPassword must not be null");
+        Objects.requireNonNull(role, "role must not be null");
     }
 
     @Override
@@ -55,7 +45,7 @@ public record LoginUserDetails(UserId userId,
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return true;
     }
 
     @Override

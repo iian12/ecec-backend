@@ -1,6 +1,6 @@
 package com.ecec.auth.infrastructure.jwt;
 
-import com.ecec.auth.domain.AccessTokenClaims;
+import com.ecec.auth.application.security.AccessTokenClaims;
 import com.ecec.user.domain.Role;
 import com.ecec.user.domain.UserId;
 import io.jsonwebtoken.Claims;

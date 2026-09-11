@@ -1,4 +1,4 @@
-package com.ecec.auth.application;
+package com.ecec.auth.application.result;
 
 import java.time.Instant;
 

@@ -1,4 +1,4 @@
-package com.ecec.auth.domain;
+package com.ecec.auth.domain.account;
 
 import jakarta.persistence.Embeddable;
 

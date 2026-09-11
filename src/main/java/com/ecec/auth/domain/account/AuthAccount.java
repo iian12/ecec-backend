@@ -1,4 +1,4 @@
-package com.ecec.auth.domain;
+package com.ecec.auth.domain.account;
 
 import com.ecec.user.domain.UserId;
 import lombok.Getter;
@@ -15,10 +15,10 @@ public class AuthAccount {
     private final AuthProvider provider;
     private final String providerUserId;
     private final Instant createdAt;
-    private Instant updateAt;
+    private Instant updatedAt;
     private Instant lastLoginAt;
 
-    public AuthAccount(AuthAccountId id, UserId userId, String email, String encodedPassword, AuthProvider provider, String providerUserId, Instant createdAt, Instant updateAt, Instant lastLoginAt) {
+    public AuthAccount(AuthAccountId id, UserId userId, String email, String encodedPassword, AuthProvider provider, String providerUserId, Instant createdAt, Instant updatedAt, Instant lastLoginAt) {
         this.id = id;
         this.userId = userId;
         this.email = email;
@@ -26,7 +26,7 @@ public class AuthAccount {
         this.provider = provider;
         this.providerUserId = providerUserId;
         this.createdAt = createdAt;
-        this.updateAt = updateAt;
+        this.updatedAt = updatedAt;
         this.lastLoginAt = lastLoginAt;
     }
 
@@ -53,6 +53,10 @@ public class AuthAccount {
         return new AuthAccount(id, userId, email, null, provider, providerUserId, Instant.now(), null, null);
     }
 
+    public static AuthAccount restore(AuthAccountId id, UserId userId, String email, String encodedPassword, AuthProvider provider, String providerUserId, Instant createdAt, Instant updatedAt, Instant lastLoginAt) {
+        return new AuthAccount(id, userId, email, encodedPassword, provider, providerUserId, createdAt, updatedAt, lastLoginAt);
+    }
+
     public void updateLastLoginAt(Instant lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
@@ -65,8 +69,8 @@ public class AuthAccount {
         this.email = email;
     }
 
-    public void updateUpdateAt(Instant updateAt) {
-        this.updateAt = updateAt;
+    public void updateUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public boolean isLocal() {
