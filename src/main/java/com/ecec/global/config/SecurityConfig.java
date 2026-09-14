@@ -72,16 +72,19 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         // CORS Preflight 요청
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // 인증 관련 공개 API
-                        .requestMatchers(
-                                "/api/v1/auth/sign-up",
+                        // 로그인 전 호출하는 API: Access Token 없이 접근 가능하다.
+                        .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login",
+                                "/api/v1/auth/sign-up"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/nickname-availability").permitAll()
+                        // 그 외 인증 관련 공개 API
+                        .requestMatchers(
                                 "/api/v1/auth/refresh",
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/csrf"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/email-verify/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/nickname-availability").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
