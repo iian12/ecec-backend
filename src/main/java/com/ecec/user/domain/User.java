@@ -80,6 +80,10 @@ public class User {
     }
 
     public void initializeNickname(String nickname) {
+        // 차단된 계정이 닉네임 초기화를 통해 다시 활성화되는 것을 막는다.
+        if (accountStatus != AccountStatus.PENDING) {
+            throw new IllegalStateException("Only pending users can initialize a nickname.");
+        }
         if (this.nickname != null) {
             throw new IllegalStateException("Nickname is already initialized.");
         }
@@ -89,6 +93,7 @@ public class User {
         }
 
         this.nickname = nickname;
+        // 소셜 인증을 마친 신규 계정의 닉네임 초기화 단계에서 호출한다.
         this.accountStatus = AccountStatus.ACTIVE;
     }
 

@@ -50,10 +50,14 @@ public class JwtAccessTokenProvider {
     public AccessTokenClaims parseAccessToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
+                .clock(() -> Date.from(clock.instant()))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
+        if (claims.getExpiration() == null || claims.getSubject() == null) {
+            throw new IllegalArgumentException("Token subject and expiration are required.");
+        }
         UserId userId = UserId.of(Long.parseLong(claims.getSubject()));
 
         String roleClaim = claims.get("role", String.class);

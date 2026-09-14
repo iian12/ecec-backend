@@ -57,4 +57,10 @@ public class UserRepositoryImpl implements UserRepository {
 
         return jpaRepository.existsByEmail(email);
     }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        Objects.requireNonNull(nickname, "Nickname must not be null");
+        return jpaRepository.existsByNickname(nickname);
+    }
 }

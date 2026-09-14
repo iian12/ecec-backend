@@ -24,6 +24,7 @@ public record LoginUserDetails(UserId userId,
         Objects.requireNonNull(email, "email must not be null");
         Objects.requireNonNull(encodedPassword, "encodedPassword must not be null");
         Objects.requireNonNull(role, "role must not be null");
+        Objects.requireNonNull(accountStatus, "accountStatus must not be null");
     }
 
     @Override
@@ -55,7 +56,8 @@ public record LoginUserDetails(UserId userId,
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        // PENDING은 비밀번호 검증 후 인증 안내를 받아야 하므로 BLOCKED만 차단한다.
+        return accountStatus != AccountStatus.BLOCKED;
     }
 
     @Override

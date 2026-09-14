@@ -24,7 +24,9 @@ public abstract class AssignedIdEntity implements Persistable<Long> {
     }
 
     @PostLoad
+    @PostPersist
     protected void markNotNew() {
+        // 직접 할당한 ID라도 저장 이후에는 새 엔티티로 취급하지 않는다.
         this.newEntity = false;
     }
 }

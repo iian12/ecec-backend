@@ -81,6 +81,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/csrf"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/email-verify/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/nickname-availability").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -11,6 +11,7 @@ public class UserMapper {
                 .id(domain.getId().value())
                 .email(domain.getEmail())
                 .nickname(domain.getNickname())
+                .profileImgUrl(domain.getProfileImgUrl())
                 .role(domain.getRole())
                 .accountStatus(domain.getAccountStatus())
                 .build();

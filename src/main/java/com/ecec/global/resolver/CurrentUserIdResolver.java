@@ -39,6 +39,8 @@ public class CurrentUserIdResolver implements HandlerMethodArgumentResolver {
             return ap.userId();
         }
 
+        // 익명 인증 객체도 isAuthenticated()가 true일 수 있다.
+        if (!required) return null;
         throw new AuthenticationCredentialsNotFoundException("Authentication required");
     }
 }

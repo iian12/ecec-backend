@@ -44,9 +44,9 @@ public class EmailVerification {
         this.createdAt =
                 Objects.requireNonNull(createdAt, "createdAt must not be null");
 
-        if (expiresAt.isBefore(createdAt)) {
+        if (!expiresAt.isAfter(createdAt)) {
             throw new IllegalArgumentException(
-                    "expiresAt must not be before createdAt"
+                    "expiresAt must be after createdAt"
             );
         }
 
@@ -119,6 +119,8 @@ public class EmailVerification {
         }
 
         if (!verificationCodeHash.equals(inputCodeHash)) {
+            // 호출 서비스는 인증 실패 예외가 발생해도 이 횟수를 저장해야 한다.
+            // 트랜잭션 롤백으로 횟수가 사라지면 시도 횟수 제한을 우회할 수 있다.
             failedAttempts++;
 
             if (hasExceededFailedAttempts()) {

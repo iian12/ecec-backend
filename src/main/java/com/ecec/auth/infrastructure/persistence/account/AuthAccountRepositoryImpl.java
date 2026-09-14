@@ -23,7 +23,17 @@ public class AuthAccountRepositoryImpl implements AuthAccountRepository {
     public AuthAccount save(AuthAccount authAccount) {
         Objects.requireNonNull(authAccount, "AuthAccount must not be null");
 
-        AuthAccountEntity savedEntity = jpaRepository.save(AuthAccountMapper.toEntity(authAccount));
+        // 복원한 도메인을 새 엔티티로 persist하면 중복 INSERT가 발생하므로 기존 엔티티를 갱신한다.
+        AuthAccountEntity entity = jpaRepository.findById(authAccount.getId().value())
+                .map(existing -> {
+                    existing.setEmail(authAccount.getEmail());
+                    existing.setEncodedPassword(authAccount.getEncodedPassword());
+                    existing.setLastLoginAt(authAccount.getLastLoginAt());
+                    existing.setUpdateAt(authAccount.getUpdatedAt());
+                    return existing;
+                })
+                .orElseGet(() -> AuthAccountMapper.toEntity(authAccount));
+        AuthAccountEntity savedEntity = jpaRepository.save(entity);
 
         return AuthAccountMapper.toDomain(savedEntity);
     }
