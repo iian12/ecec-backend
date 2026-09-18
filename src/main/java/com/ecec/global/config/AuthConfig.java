@@ -1,6 +1,7 @@
 package com.ecec.global.config;
 
 import com.ecec.auth.infrastructure.jwt.JwtProperties;
+import com.ecec.auth.infrastructure.jwt.TokenCookieProperties;
 import com.ecec.auth.infrastructure.jwt.JwtAuthenticationFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,7 +12,7 @@ import java.security.SecureRandom;
 import java.time.Clock;
 
 @Configuration
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, TokenCookieProperties.class})
 public class AuthConfig {
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> jwtFilterRegistration(JwtAuthenticationFilter filter) {

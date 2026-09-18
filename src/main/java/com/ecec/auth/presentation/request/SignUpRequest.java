@@ -16,8 +16,10 @@ public record SignUpRequest(
         @NotBlank(message = "비밀번호를 입력해 주세요.")
         @Pattern(regexp = PasswordPolicy.REGEX, message = PasswordPolicy.MESSAGE) String password,
         @NotBlank(message = "비밀번호 확인을 입력해 주세요.")
-        @Size(max = 20, message = "비밀번호 확인은 20자 이하여야 합니다.") String confirmPassword) {
+        @Size(max = 20, message = "비밀번호 확인은 20자 이하여야 합니다.") String confirmPassword,
+        @Pattern(regexp = "[A-Za-z0-9_-]{43}", message = "닉네임 예약 토큰 형식이 올바르지 않습니다.")
+        String nicknameReservationToken) {
     public SignUpCommand toCommand() {
-        return new SignUpCommand(email, password, confirmPassword, nickname);
+        return new SignUpCommand(email, password, confirmPassword, nickname, nicknameReservationToken);
     }
 }

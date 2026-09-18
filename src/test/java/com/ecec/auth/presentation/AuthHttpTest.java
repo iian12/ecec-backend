@@ -51,6 +51,19 @@ class AuthHttpTest {
         return json.writeValueAsString(Map.of("email", EMAIL, "password", password));
     }
 
+    private String reserve(String nickname) throws Exception {
+        var response = mvc.perform(post("/api/v1/auth/nickname-reservations").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("nickname", nickname))))
+                .andExpect(status().isOk()).andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(jsonPath("$.expiresAt").isString()).andReturn();
+        return (String) json.readValue(response.getResponse().getContentAsString(), Map.class).get("reservationToken");
+    }
+
+    private String reservedSignup(String nickname, String token) {
+        return json.writeValueAsString(Map.of("email", EMAIL, "nickname", nickname,
+                "password", PASSWORD, "confirmPassword", PASSWORD, "nicknameReservationToken", token));
+    }
+
     private void account(AccountStatus status) {
         users.save(User.restore(UserId.of(700L), EMAIL, "tester", null, Role.USER, status));
         accounts.save(AuthAccount.createLocal(AuthAccountId.of(701L), UserId.of(700L), EMAIL, encoder.encode(PASSWORD)));
@@ -60,8 +73,9 @@ class AuthHttpTest {
 
     @Test
     void signupReturnsPersistedVerificationIdAndStoresEncodedPassword() throws Exception {
+        String token = reserve("tester");
         var response = mvc.perform(post("/api/v1/auth/sign-up").contentType(MediaType.APPLICATION_JSON)
-                        .content(signup(EMAIL, "tester", PASSWORD, PASSWORD)))
+                        .content(reservedSignup("tester", token)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.verificationId").isString()).andReturn();
         var body = json.readValue(response.getResponse().getContentAsString(), Map.class);
         var verificationId = EmailVerificationId.of(Long.parseLong((String) body.get("verificationId")));
@@ -184,5 +198,41 @@ class AuthHttpTest {
         mvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON)
                         .content(json.writeValueAsString(Map.of("refreshToken", "a".repeat(43)))))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void reservationBlocksAvailabilityAndAnotherReservation() throws Exception {
+        reserve("reserved-name");
+        mvc.perform(get("/api/v1/auth/nickname-availability").param("nickname", "reserved-name"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.available").value(false));
+        mvc.perform(post("/api/v1/auth/nickname-reservations").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("nickname", "reserved-name"))))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("NICKNAME_RESERVED"));
+    }
+
+    @Test
+    void signupWithoutReservationIsRejected() throws Exception {
+        mvc.perform(post("/api/v1/auth/sign-up").contentType(MediaType.APPLICATION_JSON)
+                        .content(signup(EMAIL, "tester", PASSWORD, PASSWORD)))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("NICKNAME_RESERVATION_REQUIRED"));
+        assertThat(users.findByEmail(EMAIL)).isEmpty();
+    }
+
+    @Test
+    void anotherNicknamesTokenCannotBeUsed() throws Exception {
+        reserve("tester");
+        String otherToken = reserve("other-name");
+        mvc.perform(post("/api/v1/auth/sign-up").contentType(MediaType.APPLICATION_JSON)
+                        .content(reservedSignup("tester", otherToken)))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("INVALID_NICKNAME_RESERVATION"));
+        assertThat(users.findByEmail(EMAIL)).isEmpty();
+    }
+
+    @Test
+    void existingUsersNicknameCannotBeReserved() throws Exception {
+        account(AccountStatus.ACTIVE);
+        mvc.perform(post("/api/v1/auth/nickname-reservations").contentType(MediaType.APPLICATION_JSON)
+                        .content(json.writeValueAsString(Map.of("nickname", "tester"))))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("NICKNAME_ALREADY_IN_USE"));
     }
 }

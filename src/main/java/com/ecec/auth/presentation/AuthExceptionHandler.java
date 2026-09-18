@@ -3,6 +3,7 @@ package com.ecec.auth.presentation;
 import com.ecec.auth.exception.AuthRequestException;
 import com.ecec.auth.presentation.response.AuthErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,8 +19,18 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = AuthController.class)
+@RestControllerAdvice(assignableTypes = {AuthController.class, AdminAuthController.class})
 public class AuthExceptionHandler {
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<AuthErrorResponse> adminRequired() {
+        return error(HttpStatus.FORBIDDEN, "ADMIN_REQUIRED", "관리자 권한이 필요합니다.", Map.of());
+    }
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    public ResponseEntity<AuthErrorResponse> concurrentRequest() {
+        // MariaDB에서 최초 예약의 동시 INSERT가 데드락으로 판정되는 경우에도 재시도 가능한 오류를 반환한다.
+        return error(HttpStatus.CONFLICT, "CONCURRENT_REQUEST", "동시에 처리 중인 요청이 있습니다. 다시 시도해 주세요.", Map.of());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<AuthErrorResponse> invalidFields(MethodArgumentNotValidException exception) {
         Map<String, String> fields = new LinkedHashMap<>();

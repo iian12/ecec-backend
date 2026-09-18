@@ -2,6 +2,9 @@ package com.ecec.auth.presentation;
 
 import com.ecec.auth.application.AuthService;
 import com.ecec.auth.application.TokenRefreshService;
+import com.ecec.auth.application.NicknameReservationService;
+import com.ecec.auth.application.result.NicknameReservationResult;
+import com.ecec.auth.presentation.request.NicknameReservationRequest;
 import com.ecec.auth.presentation.request.TokenRefreshRequest;
 import com.ecec.auth.application.result.EmailVerificationRequireResult;
 import com.ecec.auth.application.result.LoginResult;
@@ -29,10 +32,12 @@ public class AuthController {
 
     private final AuthService authService;
     private final TokenRefreshService tokenRefreshService;
+    private final NicknameReservationService nicknameReservations;
 
-    public AuthController(AuthService authService, TokenRefreshService tokenRefreshService) {
+    public AuthController(AuthService authService, TokenRefreshService tokenRefreshService, NicknameReservationService nicknameReservations) {
         this.authService = authService;
         this.tokenRefreshService = tokenRefreshService;
+        this.nicknameReservations = nicknameReservations;
     }
 
     @PostMapping("/sign-up")
@@ -67,5 +72,12 @@ public class AuthController {
     public LoginSuccessResponse refresh(@Valid @RequestBody TokenRefreshRequest request) {
         var result = tokenRefreshService.refresh(request.refreshToken());
         return new LoginSuccessResponse(result.accessToken(), result.refreshToken());
+    }
+
+    // 검사와 예약을 한 번에 수행한다. 토큰이 포함된 응답은 캐시하지 않는다.
+    @PostMapping("/nickname-reservations")
+    public ResponseEntity<NicknameReservationResult> reserveNickname(@Valid @RequestBody NicknameReservationRequest request) {
+        return ResponseEntity.ok().cacheControl(org.springframework.http.CacheControl.noStore())
+                .body(nicknameReservations.reserve(request.nickname()));
     }
 }

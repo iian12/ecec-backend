@@ -38,6 +38,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final EmailVerificationService emailVerificationService;
+    private final NicknameReservationService nicknameReservations;
 
     public AuthService(
             UserRepository userRepository,
@@ -47,7 +48,8 @@ public class AuthService {
             TokenRefreshService tokenRefreshService,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authenticationManager,
-            EmailVerificationService emailVerificationService
+            EmailVerificationService emailVerificationService,
+            NicknameReservationService nicknameReservations
     ) {
         this.userRepository = userRepository;
         this.authAccountRepository = authAccountRepository;
@@ -57,6 +59,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.emailVerificationService = emailVerificationService;
+        this.nicknameReservations = nicknameReservations;
     }
 
     @Transactional
@@ -69,10 +72,12 @@ public class AuthService {
         if (userRepository.existsByEmail(command.email())) {
             throw new AuthRequestException("EMAIL_ALREADY_IN_USE", "email", "이미 사용 중인 이메일입니다.", true);
         }
-        // 사전 검사 API는 예약이 아니므로 가입 트랜잭션에서도 다시 확인한다.
-        if (!isNicknameAvailable(command.nickname())) {
+        if (userRepository.existsByNickname(command.nickname())) {
             throw new AuthRequestException("NICKNAME_ALREADY_IN_USE", "nickname", "이미 사용 중인 닉네임입니다.", true);
         }
+
+        // 예약자의 토큰을 검증하고 가입 완료까지 닉네임 예약 행의 잠금을 유지한다.
+        nicknameReservations.consume(command.nickname(), command.nicknameReservationToken());
 
         UserId userId = UserId.of(idGenerator.nextId());
         AuthAccountId authAccountId = AuthAccountId.of(idGenerator.nextId());
@@ -120,10 +125,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public boolean isNicknameAvailable(String nickname) {
-        if (nickname == null || nickname.isBlank() || nickname.length() > 255) {
-            throw new AuthRequestException("INVALID_NICKNAME", "nickname", "닉네임은 공백이 아닌 1~255자로 입력해 주세요.", false);
-        }
-        return !userRepository.existsByNickname(nickname);
+        return nicknameReservations.isAvailable(nickname);
     }
 
 }

@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                         // 매 요청시마다 CSRF 토큰 재발급 방지
                         .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
-                        .ignoringRequestMatchers("/api/v1/auth/sign-up", "/api/v1/auth/login"))
+                        .ignoringRequestMatchers("/api/v1/auth/sign-up", "/api/v1/auth/login", "/api/v1/auth/nickname-reservations"))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -75,9 +75,13 @@ public class SecurityConfig {
                         // 로그인 전 호출하는 API: Access Token 없이 접근 가능하다.
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/auth/login",
-                                "/api/v1/auth/sign-up"
+                                "/api/v1/auth/sign-up",
+                                "/api/v1/auth/nickname-reservations"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/nickname-availability").permitAll()
+                        // 로그인·갱신은 Access Token 없이 호출하지만 쿠키 인증이므로 CSRF 검증은 유지한다.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/auth/login", "/api/v1/admin/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         // 그 외 인증 관련 공개 API
                         .requestMatchers(
                                 "/api/v1/auth/refresh",
