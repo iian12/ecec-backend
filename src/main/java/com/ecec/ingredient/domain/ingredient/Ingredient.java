@@ -10,12 +10,12 @@ public class Ingredient {
     private final IngredientId id;
     private String name;
     private IngredientCategoryId categoryId;
-    private String iconUrl;
+    private String iconKey;
     private int sortOrder;
 
-    private Ingredient(IngredientId id, String name, IngredientCategoryId categoryId, String iconUrl, int sortOrder) {
+    private Ingredient(IngredientId id, String name, IngredientCategoryId categoryId, String iconKey, int sortOrder) {
         this.id = Objects.requireNonNull(id, "id must not be null");
-        update(name, categoryId, iconUrl);
+        update(name, categoryId, iconKey);
         changeSortOrder(sortOrder);
     }
 
@@ -33,7 +33,7 @@ public class Ingredient {
         Objects.requireNonNull(categoryId, "categoryId must not be null");
         this.name = name;
         this.categoryId = categoryId;
-        this.iconUrl = iconUrl;
+        this.iconKey = iconUrl;
     }
 
     // 같은 그룹 안에서 작은 값이 먼저 노출된다. 동일한 값은 ID로 순서를 결정한다.

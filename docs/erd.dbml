@@ -1,0 +1,112 @@
+// 로컬 소스 매핑 기록. 물리 DB에서 추출한 스키마가 아닙니다.
+// migration/schema/ORM XML 정의는 발견되지 않아 DDL과 대조할 수 없습니다.
+// @Table/@Column name이 있으면 그대로 사용하고, 없으면 JPA 논리 이름(클래스/필드명)을 보존합니다.
+// 물리 naming strategy의 snake_case 변환을 추정하지 않습니다.
+// 타입은 소스에 선언된 Java 타입입니다. SQL 타입/길이/시간 정밀도를 추정하지 않습니다.
+// 명시된 length, EnumType.STRING, @Version은 note로 기록합니다.
+// nullable=false, unique=true, @Id 및 @Index만 제약으로 기록합니다.
+// 미지정 nullability는 확정하지 않습니다(DBML 뷰어의 기본 nullable 표시는 소스 검증 결과가 아님).
+// FK/연관관계 매핑이 없어 Ref는 없습니다. *_id/userId 등의 이름만으로 관계를 만들지 않습니다.
+// ID는 AssignedIdEntity의 @Id를 상속하며 @GeneratedValue는 없습니다.
+// @Transient newEntity, 사용되지 않는 @Embeddable ID 값 객체는 컬럼/테이블에서 제외합니다.
+// RecipeEntity.java는 @Entity 없는 빈 클래스이므로 제외합니다.
+// 설정 근거: src/main/resources/application.properties (MariaDBDialect, ddl-auto=update)
+// 테스트 설정: src/test/resources/application-test.properties (H2Dialect, ddl-auto=create-drop)
+// 의존성 근거: build.gradle
+// 공통 ID 근거: src/main/java/com/ecec/global/id/AssignedIdEntity.java
+
+// 근거: src/main/java/com/ecec/auth/infrastructure/persistence/account/AuthAccountEntity.java
+Table "auth_accounts" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "userId" Long [note: 'Java Long; field=userId; 논리 컬럼명; @Column name 미지정']
+  "email" String [note: 'Java String; field=email; 논리 컬럼명; @Column name 미지정']
+  "encodedPassword" String [note: 'Java String; field=encodedPassword; 논리 컬럼명; @Column name 미지정']
+  "provider" AuthProvider [note: 'Java AuthProvider; field=provider; 논리 컬럼명; @Column name 미지정; @Enumerated(EnumType.STRING); DB enum/SQL type 미확정']
+  "providerUserId" String [note: 'Java String; field=providerUserId; 논리 컬럼명; @Column name 미지정']
+  "createdAt" Instant [note: 'Java Instant; field=createdAt; 논리 컬럼명; @Column name 미지정']
+  "updatedAt" Instant [note: 'Java Instant; field=updatedAt; 논리 컬럼명; @Column name 미지정']
+  "lastLoginAt" Instant [note: 'Java Instant; field=lastLoginAt; 논리 컬럼명; @Column name 미지정']
+}
+
+// 근거: src/main/java/com/ecec/auth/infrastructure/persistence/nickname/NicknameReservationEntity.java
+Table "nickname_reservations" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "nickname" String [pk, not null, note: 'Java String; field=nickname; 논리 컬럼명; @Column name 미지정; @Column length=255']
+  "tokenHash" String [not null, note: 'Java String; field=tokenHash; 논리 컬럼명; @Column name 미지정; @Column length=43']
+  "expiresAt" Instant [not null, note: 'Java Instant; field=expiresAt; 논리 컬럼명; @Column name 미지정']
+  "consumed" boolean [not null, note: 'Java boolean; field=consumed; 논리 컬럼명; @Column name 미지정']
+}
+
+// 근거: src/main/java/com/ecec/auth/infrastructure/persistence/token/RefreshTokenEntity.java
+Table "refresh_tokens" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "userId" Long [not null, note: 'Java Long; field=userId; 논리 컬럼명; @Column name 미지정']
+  "tokenHash" String [not null, unique, note: 'Java String; field=tokenHash; 논리 컬럼명; @Column name 미지정; @Column length=43']
+  "expiresAt" Instant [not null, note: 'Java Instant; field=expiresAt; 논리 컬럼명; @Column name 미지정']
+}
+
+// 근거: src/main/java/com/ecec/auth/infrastructure/persistence/verification/EmailVerificationEntity.java
+Table "EmailVerificationEntity" {
+  Note: '@Table 미지정: 클래스의 JPA 논리 이름이며 물리 테이블명은 미확정. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "userId" Long [note: 'Java Long; field=userId; 논리 컬럼명; @Column name 미지정']
+  "verificationCodeHash" String [note: 'Java String; field=verificationCodeHash; 논리 컬럼명; @Column name 미지정']
+  "expiresAt" Instant [note: 'Java Instant; field=expiresAt; 논리 컬럼명; @Column name 미지정']
+  "verifiedAt" Instant [note: 'Java Instant; field=verifiedAt; 논리 컬럼명; @Column name 미지정']
+  "failedAttempts" int [note: 'Java int; field=failedAttempts; 논리 컬럼명; @Column name 미지정']
+  "createdAt" Instant [note: 'Java Instant; field=createdAt; 논리 컬럼명; @Column name 미지정']
+}
+
+// 근거: src/main/java/com/ecec/ingredient/infrastructure/persistence/alias/IngredientAliaseEntity.java
+Table "ingredient_aliases" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "version" Long [note: 'Java Long; field=version; 논리 컬럼명; @Column name 미지정; @Version']
+  "ingredient_id" Long [not null, note: 'Java Long; field=ingredientId']
+  "alias" String [not null, note: 'Java String; field=alias']
+  "sort_order" int [not null, note: 'Java int; field=sortOrder']
+  indexes {
+    ("ingredient_id", "sort_order", "id") [name: 'idx_ingredient_aliases_order']
+  }
+}
+
+// 근거: src/main/java/com/ecec/ingredient/infrastructure/persistence/category/IngredientCategoryEntity.java
+Table "ingredient_categories" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "version" Long [note: 'Java Long; field=version; 논리 컬럼명; @Column name 미지정; @Version']
+  "name" String [not null, note: 'Java String; field=name']
+  "parent_category_id" Long [null, note: 'Java Long; field=parentCategoryId']
+  "sort_order" int [not null, note: 'Java int; field=sortOrder']
+  indexes {
+    ("parent_category_id", "sort_order", "id") [name: 'idx_ingredient_categories_order']
+  }
+}
+
+// 근거: src/main/java/com/ecec/ingredient/infrastructure/persistence/ingredient/IngredientEntity.java
+Table "ingredient" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "version" Long [note: 'Java Long; field=version; 논리 컬럼명; @Column name 미지정; @Version']
+  "name" String [not null, note: 'Java String; field=name']
+  "category_id" Long [not null, note: 'Java Long; field=categoryId']
+  "icon_url" String [null, note: 'Java String; field=iconKey']
+  "sort_order" int [not null, note: 'Java int; field=sortOrder']
+  indexes {
+    ("category_id", "sort_order", "id") [name: 'idx_ingredient_order']
+  }
+}
+
+// 근거: src/main/java/com/ecec/user/infrastructure/persistence/UserEntity.java
+Table "users" {
+  Note: '명시적 @Table 이름. Java 타입을 그대로 표기한 매핑 문서.'
+  "id" Long [pk, not null, note: 'AssignedIdEntity.id; @Column(updatable=false); 논리 컬럼명']
+  "email" String [unique, note: 'Java String; field=email; 논리 컬럼명; @Column name 미지정']
+  "nickname" String [unique, note: 'Java String; field=nickname; 논리 컬럼명; @Column name 미지정']
+  "profileImgPath" String [note: 'Java String; field=profileImgPath; 논리 컬럼명; @Column name 미지정']
+  "role" Role [note: 'Java Role; field=role; 논리 컬럼명; @Column name 미지정; @Enumerated(EnumType.STRING); DB enum/SQL type 미확정']
+  "accountStatus" AccountStatus [note: 'Java AccountStatus; field=accountStatus; 논리 컬럼명; @Column name 미지정; @Enumerated(EnumType.STRING); DB enum/SQL type 미확정']
+}
+

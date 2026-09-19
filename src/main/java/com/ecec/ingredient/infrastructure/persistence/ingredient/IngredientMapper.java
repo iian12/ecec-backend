@@ -12,7 +12,7 @@ public final class IngredientMapper {
                 .id(domain.getId().value())
                 .name(domain.getName())
                 .categoryId(domain.getCategoryId().value())
-                .iconUrl(domain.getIconUrl())
+                .iconKey(domain.getIconKey())
                 .sortOrder(domain.getSortOrder())
                 .build();
     }
@@ -21,14 +21,14 @@ public final class IngredientMapper {
         return Ingredient.restore(IngredientId.of(entity.getId()),
                 entity.getName(),
                 IngredientCategoryId.of(entity.getCategoryId()),
-                entity.getIconUrl(),
+                entity.getIconKey(),
                 entity.getSortOrder());
     }
 
     public static void updateEntity(Ingredient domain, IngredientEntity entity) {
         entity.update(domain.getName(),
                 domain.getCategoryId().value(),
-                domain.getIconUrl(),
+                domain.getIconKey(),
                 domain.getSortOrder());
     }
 }

@@ -31,13 +31,13 @@ class UserAuthPersistenceTest {
         users.save(User.restore(id, "image@example.com", "profile", "first.png", Role.USER, AccountStatus.ACTIVE));
         reload();
         var user = users.findById(id).orElseThrow();
-        assertThat(user.getProfileImgUrl()).isEqualTo("first.png");
+        assertThat(user.getProfileImgPath()).isEqualTo("first.png");
         user.changeProfileImgUrl("second.png");
         user.block();
         users.save(user);
         reload();
         var restored = users.findById(id).orElseThrow();
-        assertThat(restored.getProfileImgUrl()).isEqualTo("second.png");
+        assertThat(restored.getProfileImgPath()).isEqualTo("second.png");
         assertThat(restored.getAccountStatus()).isEqualTo(AccountStatus.BLOCKED);
     }
 

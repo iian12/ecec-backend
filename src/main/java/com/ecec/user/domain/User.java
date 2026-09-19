@@ -1,6 +1,5 @@
 package com.ecec.user.domain;
 
-import com.ecec.user.infrastructure.persistence.UserEntity;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -11,7 +10,7 @@ public class User {
     private final String email;
 
     private String nickname;
-    private String profileImgUrl;
+    private String profileImgPath;
 
     private final Role role;
     private AccountStatus accountStatus;
@@ -20,14 +19,14 @@ public class User {
             UserId id,
             String email,
             String nickname,
-            String profileImgUrl,
+            String profileImgPath,
             Role role,
             AccountStatus accountStatus
     ) {
         this.id = Objects.requireNonNull(id);
         this.email = requireNotBlank(email);
         this.nickname = nickname;
-        this.profileImgUrl = profileImgUrl;
+        this.profileImgPath = profileImgPath;
         this.role = Objects.requireNonNull(role);
         this.accountStatus = Objects.requireNonNull(accountStatus);
     }
@@ -98,7 +97,7 @@ public class User {
     }
 
     public void changeProfileImgUrl(String profileImgUrl) {
-        this.profileImgUrl = profileImgUrl;
+        this.profileImgPath = profileImgUrl;
     }
 
     public void block() {

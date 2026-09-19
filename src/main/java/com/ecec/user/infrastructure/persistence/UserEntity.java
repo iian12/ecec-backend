@@ -22,7 +22,7 @@ public class UserEntity extends AssignedIdEntity {
     private String nickname;
 
     @Column
-    private String profileImgUrl;
+    private String profileImgPath;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -33,11 +33,11 @@ public class UserEntity extends AssignedIdEntity {
     private AccountStatus accountStatus;
 
     @Builder
-    public UserEntity(Long id, String email, String nickname, String profileImgUrl, Role role, AccountStatus accountStatus) {
+    public UserEntity(Long id, String email, String nickname, String profileImgPath, Role role, AccountStatus accountStatus) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
-        this.profileImgUrl = profileImgUrl;
+        this.profileImgPath = profileImgPath;
         this.role = role;
         this.accountStatus = accountStatus;
     }
@@ -50,7 +50,7 @@ public class UserEntity extends AssignedIdEntity {
         this.accountStatus = accountStatus;
     }
 
-    void setProfileImgUrl(String profileImgUrl) {
-        this.profileImgUrl = profileImgUrl;
+    void setProfileImgPath(String profileImgPath) {
+        this.profileImgPath = profileImgPath;
     }
 }

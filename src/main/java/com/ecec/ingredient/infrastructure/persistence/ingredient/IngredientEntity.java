@@ -1,7 +1,5 @@
 package com.ecec.ingredient.infrastructure.persistence.ingredient;
 
-import com.ecec.ingredient.domain.ingredient.Ingredient;
-
 import com.ecec.global.id.AssignedIdEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,25 +24,25 @@ public class IngredientEntity extends AssignedIdEntity {
     private Long categoryId;
 
     @Column(name = "icon_url", nullable = true)
-    private String iconUrl;
+    private String iconKey;
 
     // 목록 순서는 PK와 분리해 어드민에서 자유롭게 변경할 수 있다.
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
     @Builder
-    public IngredientEntity(Long id, String name, Long categoryId, String iconUrl, int sortOrder) {
+    public IngredientEntity(Long id, String name, Long categoryId, String iconKey, int sortOrder) {
         this.id = id;
         this.name = name;
         this.categoryId = categoryId;
-        this.iconUrl = iconUrl;
+        this.iconKey = iconKey;
         this.sortOrder = sortOrder;
     }
 
     void update(String name, Long categoryId, String iconUrl, int sortOrder) {
         this.name = name;
         this.categoryId = categoryId;
-        this.iconUrl = iconUrl;
+        this.iconKey = iconUrl;
         this.sortOrder = sortOrder;
     }
 }

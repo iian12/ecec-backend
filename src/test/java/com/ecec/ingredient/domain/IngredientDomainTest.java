@@ -72,7 +72,7 @@ class IngredientDomainTest {
         assertThatNullPointerException().isThrownBy(() -> ingredient.update("감자", null, null));
         assertThat(ingredient.getName()).isEqualTo("양파");
         assertThat(ingredient.getCategoryId()).isEqualTo(categoryId);
-        assertThat(ingredient.getIconUrl()).isEqualTo("icon.png");
+        assertThat(ingredient.getIconKey()).isEqualTo("icon.png");
     }
 
     @Test

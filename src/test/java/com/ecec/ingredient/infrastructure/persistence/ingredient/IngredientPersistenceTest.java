@@ -111,7 +111,7 @@ class IngredientPersistenceTest {
         assertThat(ingredients.findAll()).singleElement().satisfies(value -> {
             assertThat(value.getName()).isEqualTo("양파");
             assertThat(value.getCategoryId()).isEqualTo(IngredientCategoryId.of(200L));
-            assertThat(value.getIconUrl()).isEqualTo("https://example.com/new.png");
+            assertThat(value.getIconKey()).isEqualTo("https://example.com/new.png");
             assertThat(value.getSortOrder()).isEqualTo(8);
         });
         assertThat(aliases.findAll()).singleElement().satisfies(value -> {
@@ -140,9 +140,9 @@ class IngredientPersistenceTest {
         var stale = entityManager.find(IngredientEntity.class, 1L);
         entityManager.detach(stale);
         var current = entityManager.find(IngredientEntity.class, 1L);
-        current.update(current.getName(), current.getCategoryId(), current.getIconUrl(), 5);
+        current.update(current.getName(), current.getCategoryId(), current.getIconKey(), 5);
         entityManager.flush();
-        stale.update(stale.getName(), stale.getCategoryId(), stale.getIconUrl(), 9);
+        stale.update(stale.getName(), stale.getCategoryId(), stale.getIconKey(), 9);
         assertThatThrownBy(() -> entityManager.merge(stale)).isInstanceOf(OptimisticLockException.class);
     }
 

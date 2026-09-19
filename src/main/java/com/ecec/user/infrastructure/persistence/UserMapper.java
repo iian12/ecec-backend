@@ -11,7 +11,7 @@ public class UserMapper {
                 .id(domain.getId().value())
                 .email(domain.getEmail())
                 .nickname(domain.getNickname())
-                .profileImgUrl(domain.getProfileImgUrl())
+                .profileImgPath(domain.getProfileImgPath())
                 .role(domain.getRole())
                 .accountStatus(domain.getAccountStatus())
                 .build();
@@ -22,7 +22,7 @@ public class UserMapper {
                 UserId.of(entity.getId()),
                 entity.getEmail(),
                 entity.getNickname(),
-                entity.getProfileImgUrl(),
+                entity.getProfileImgPath(),
                 entity.getRole(),
                 entity.getAccountStatus()
         );
@@ -31,6 +31,6 @@ public class UserMapper {
     public static void updateEntity(User domain, UserEntity entity) {
         entity.setNickname(domain.getNickname());
         entity.setAccountStatus(domain.getAccountStatus());
-        entity.setProfileImgUrl(domain.getProfileImgUrl());
+        entity.setProfileImgPath(domain.getProfileImgPath());
     }
 }
